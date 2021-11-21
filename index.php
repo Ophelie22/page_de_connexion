@@ -1,3 +1,58 @@
+<?php
+
+// on va orevenir pho qu'on va utiliser les sessions
+session_start();
+//deterter l'(envoie de notre formulaire
+if (!empty($_POST['email']) && !empty($_POST['password'])) {
+    require('src/connect.php');
+    //CREATION DE NOS VARIABLES
+    $email 					= htmlspecialchars($_POST['email']);
+    $password 			= htmlspecialchars($_POST['password']);
+    
+    // VERIFICATION DE L'EMAIL VALIDE
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
+        exit();
+    }
+
+    // CHIFFRAGE DU MOT DE PASSE
+    $password = "aq1".sha1($password."123")."25";
+
+    // VERIFICATION EMAIL DEJA UTLISE
+    $req = $db->prepare("SELECT count(*) as numberEmail FROM users WHERE email = ?");
+    $req->execute(array($email));
+
+    while ($email_verification = $req->fetch()) {
+        // cette fois on verifie si c different de un et pas de 0 car il faut qu'il y est un seul compte qui est cet email la
+				if ($email_verification['numberEmail'] != 1) {
+            // ici il faudra changt que c l'email qui cloche donc mettre plutot vos identifiants st incorrects
+						header('location: index.php?error=1&message=Imposssible de vous identifier.');
+            exit();
+        }
+    }
+		// CONNEXION
+		$req = $db->prepare("SELECT * FROM users WHERE email = ?");
+		$req->execute(array($email));
+
+        while ($users = $req->fetch()) {
+
+            if ($password == $users['password'])
+						 {
+                $_SESSION['connect'] = 1;
+                $_SESSION['email']   = $users['email'];
+
+                header('location: index.php?success=1');
+								exit();
+            }
+						else {
+							header('location: index.php?error=1&message=Imposssible de vous identifier.');
+						}
+        }
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +68,19 @@
 	<section>
 		<div id="login-body">
 				<h1>S'identifier</h1>
+				
+				<?php 
+				// si le message error apparait ds l'URL
+				if(isset($_GET['error'])) {
+				// si le message message apparait ds l'URL
+						if(isset($_GET['message'])) {
+							echo'<div class="alert error">'.htmlspecialchars($_GET['message']).'</div>';
+						}
+			} else if(isset($_GET['success'])){
+					echo'<div class="alert success">'.htmlspecialchars($_GET['message']).'</div>';
+					} 
+					?>
+		
 
 				<form method="post" action="index.php">
 					<input type="email" name="email" placeholder="Votre adresse email" required />

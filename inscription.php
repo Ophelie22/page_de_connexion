@@ -1,9 +1,10 @@
 <?php
 // on va orevenir pho qu'on va utiliser les sessions
 session_start();
+
 //deterter l'(envoie de notre formulaire
 if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])) {
-    require('src/connect.php');
+require('src/connect.php');
 
 
     //CREATION DE NOS VARIABLES
@@ -23,7 +24,7 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['pass
         exit();
     }
     // VERIFICATION EMAIL DEJA UTLISE
-    $req = $db->prepare("SELECT count(*) as numberEmail FROM user WHERE email = ?");
+    $req = $db->prepare("SELECT count(*) as numberEmail FROM users WHERE email = ?");
     $req->execute(array($email));
 
     while ($email_verification = $req->fetch()) {
@@ -40,15 +41,13 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['pass
 		$password = "aq1".sha1($password."123")."25";
 
 		//ENVOI DE NOS DONNEES EN BDD
-		$req = $db->prepare("INSERT INTO user(email, password, secret) VALUES(?,?,?)");
+		$req = $db->prepare("INSERT INTO users(email, password, secret) VALUES(?,?,?)");
 		$req->execute(array($email, $password, $secret));
 
 		header('location: inscription.php?success=1');
 		exit();
 
 	}
-
-
 
 ?>
 
