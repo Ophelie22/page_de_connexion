@@ -2,6 +2,12 @@
 // on va orevenir pho qu'on va utiliser les sessions
 session_start();
 
+if(!isset($_SESSION['connect'])){
+		header('location: index.php');
+		exit();
+	}
+
+
 //deterter l'(envoie de notre formulaire
 if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])) {
 require('src/connect.php');
