@@ -9,7 +9,9 @@
 	}
 
 	if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])){
-
+    
+//on met le require ici car pas de requete SQL pour ps aloudir notre bande passante on le met ds notre
+// condition car on a besoin que quand on envoie l'utilisateur ca evite de charger la BDD inutilement
 		require('src/connect.php');
 
 		// VARIABLES
