@@ -2,9 +2,13 @@
 
 // on va orevenir pho qu'on va utiliser les sessions
 session_start();
+// on va voir si un ccokie est deja cree
+require('src/log.php');
+
 //deterter l'(envoie de notre formulaire
 if (!empty($_POST['email']) && !empty($_POST['password'])) {
     require('src/connect.php');
+
     //CREATION DE NOS VARIABLES
     $email 					= htmlspecialchars($_POST['email']);
     $password 			= htmlspecialchars($_POST['password']);
@@ -41,6 +45,12 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
                 $_SESSION['connect'] = 1;
                 $_SESSION['email']   = $users['email'];
 
+								//creation de notre systeme de cookie pour pas qu'a chaque fermeture on est a le repasser valable
+								//un an
+								if(isset($_POST['auto'])){
+								setcookie('auth', $user['secret'], time() + 364*24*3600, '/', null, false, true);
+				}
+
                 header('location: index.php?success=1');
 								exit();
             }
@@ -72,6 +82,11 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
 					<!--on va metre en place notre cookies de connection avec la session -->
 		
 					<h1>Bonjour !</h1>
+					<?php
+
+					if(isset($_GET['success'])){
+						echo'<div class="alert success">Vous êtes maintenant connecté.</div>';
+					} ?>
 					<p> C'est parti pour un moment de détente avec Netflix</p>
 					<small><a href="logout.php">Déconnexion</a></small>
 						
