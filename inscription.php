@@ -1,42 +1,23 @@
 <?php
-	session_start();
+// on va orevenir pho qu'on va utiliser les sessions
+session_start();
+//deterter l'(envoie de notre formulaire
+if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])) {
 
-	require('src/log.php');
 
-	if(!isset($_SESSION['connect'])){
-		header('location: index.php');
-		exit();
-	}
+//CREATION DE NOS VARIABLES
+    $email 					= htmlspecialchars($_POST['email']);
+    $password 			= htmlspecialchars($_POST['password']);
+    $password_two		= htmlspecialchars($_POST['password_two']);
 
-	if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])){
-    
-//on met le require ici car pas de requete SQL pour ps aloudir notre bande passante on le met ds notre
-// condition car on a besoin que quand on envoie l'utilisateur ca evite de charger la BDD inutilement
-		require('src/connect.php');
+    // PASSWORD = PASSWORD TWO VERIFICATION
+    if ($password != $password_two) {
+        header('location: inscription.php?error=1&message=Vos mots de passe ne sont pas identiques.');
+        exit();
+    }
+}
 
-		// VARIABLES
-		$email 				= htmlspecialchars($_POST['email']);
-		$password 			= htmlspecialchars($_POST['password']);
-		$password_two		= htmlspecialchars($_POST['password_two']);
-
-		// PASSWORD = PASSWORD TWO
-		if($password != $password_two){
-
-			header('location: inscription.php?error=1&message=Vos mots de passe ne sont pas identiques.');
-			exit();
-
-		}
-
-		// ADRESSE EMAIL VALIDE la fct filtrer_var on va mettre la ! devant car de base ca va 
-    //dire true  sir l'email n'est pas valide, ca va metre
-		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-      //redirection si l'email est pas valide, et on personnalise le msg.
-			header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
-			exit();
-
-		}
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -54,11 +35,10 @@
 		<div id="login-body">
 			<h1>S'inscrire</h1>
 
-			<?php if(isset($_GET['error'])){
+	<?php if(isset($_GET['error'])){
 
 				if(isset($_GET['message'])) {
-//ici on met un  specialcharacters pour eviter que l'utilisateur change l'url 
-//point css alert et error suivant ce que ca fait
+					//on concatene 
 					echo'<div class="alert error">'.htmlspecialchars($_GET['message']).'</div>';
 
 				}
@@ -67,7 +47,8 @@
 
 				echo'<div class="alert success">Vous êtes désormais inscrit. <a href="index.php">Connectez-vous</a>.</div>';
 
-			} ?>
+			} 
+?>
 
 			<form method="post" action="inscription.php">
 				<input type="email" name="email" placeholder="Votre adresse email" required />
