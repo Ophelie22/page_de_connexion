@@ -3,27 +3,52 @@
 session_start();
 //deterter l'(envoie de notre formulaire
 if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_two'])) {
+    require('src/connect.php');
 
 
-//CREATION DE NOS VARIABLES
+    //CREATION DE NOS VARIABLES
     $email 					= htmlspecialchars($_POST['email']);
     $password 			= htmlspecialchars($_POST['password']);
     $password_two		= htmlspecialchars($_POST['password_two']);
 
-// PASSWORD = PASSWORD TWO VERIFICATION
+    // PASSWORD = PASSWORD TWO VERIFICATION
     if ($password != $password_two) {
         header('location: inscription.php?error=1&message=Vos mots de passe ne sont pas identiques.');
         exit();
     }
 
-// VERIFICATION DE L'EMAIL VALIDE
-		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+    // VERIFICATION DE L'EMAIL VALIDE
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
+        exit();
+    }
+    // VERIFICATION EMAIL DEJA UTLISE
+    $req = $db->prepare("SELECT count(*) as numberEmail FROM user WHERE email = ?");
+    $req->execute(array($email));
 
-			header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
-			exit();
+    while ($email_verification = $req->fetch()) {
+        if ($email_verification['numberEmail'] != 0) {
+            header('location: inscription.php?error=1&message=Votre adresse email est déjà utilisée par un autre utilisateur.');
+            exit();
+        }
+    }
+		//HASH
+		$secret = sha1($email).time();
+		$secret = sha1($secret).time();
 
-		}
-}
+		// CHIFFRAGE DU MOT DE PASSE
+		$password = "aq1".sha1($password."123")."25";
+
+		//ENVOI DE NOS DONNEES EN BDD
+		$req = $db->prepare("INSERT INTO user(email, password, secret) VALUES(?,?,?)");
+		$req->execute(array($email, $password, $secret));
+
+		header('location: inscription.php?success=1');
+		exit();
+
+	}
+
+
 
 ?>
 
@@ -37,26 +62,25 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['pass
 </head>
 <body>
 
-	<?php include('src/header.php'); ?>
+	<?php include('src/header.php'); 
+	?>
 	
 	<section>
 		<div id="login-body">
 			<h1>S'inscrire</h1>
 
-	<?php if(isset($_GET['error'])){
+	<?php
+	 if(isset($_GET['error'])){
 
 				if(isset($_GET['message'])) {
 					//on concatene 
 					echo'<div class="alert error">'.htmlspecialchars($_GET['message']).'</div>';
 
 				}
-
-			} else if(isset($_GET['success'])) {
-
-				echo'<div class="alert success">Vous êtes désormais inscrit. <a href="index.php">Connectez-vous</a>.</div>';
-
-			} 
-?>
+		} else if (isset($_GET['success'])) {
+			echo'<div class="alert success">Vous êtes désormais inscrit. <a href="index.php">Connectez-vous</a>.</div>'; 
+		}
+	?>
 
 			<form method="post" action="inscription.php">
 				<input type="email" name="email" placeholder="Votre adresse email" required />
