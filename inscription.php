@@ -10,11 +10,19 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['pass
     $password 			= htmlspecialchars($_POST['password']);
     $password_two		= htmlspecialchars($_POST['password_two']);
 
-    // PASSWORD = PASSWORD TWO VERIFICATION
+// PASSWORD = PASSWORD TWO VERIFICATION
     if ($password != $password_two) {
         header('location: inscription.php?error=1&message=Vos mots de passe ne sont pas identiques.');
         exit();
     }
+
+// VERIFICATION DE L'EMAIL VALIDE
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+
+			header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
+			exit();
+
+		}
 }
 
 ?>
