@@ -73,6 +73,7 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
 		
 					<h1>Bonjour !</h1>
 					<p> C'est parti pour un moment de détente avec Netflix</p>
+					<small><a href="logout.php">Déconnexion</a></small>
 						
 			<?php } else { ?>
 				

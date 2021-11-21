@@ -2,7 +2,7 @@
 // on va orevenir pho qu'on va utiliser les sessions
 session_start();
 
-if(!isset($_SESSION['connect'])){
+if(isset($_SESSION['connect'])){
 		header('location: index.php');
 		exit();
 	}
