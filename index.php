@@ -11,7 +11,7 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
     
     // VERIFICATION DE L'EMAIL VALIDE
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('location: inscription.php?error=1&message=Votre adresse email est invalide.');
+        header('location: index.php?error=1&message=Votre adresse email est invalide.');
         exit();
     }
 
@@ -46,6 +46,7 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
             }
 						else {
 							header('location: index.php?error=1&message=Imposssible de vous identifier.');
+							exit();
 						}
         }
 }
@@ -67,32 +68,39 @@ if (!empty($_POST['email']) && !empty($_POST['password'])) {
 	
 	<section>
 		<div id="login-body">
-				<h1>S'identifier</h1>
-				
-				<?php 
-				// si le message error apparait ds l'URL
-				if(isset($_GET['error'])) {
-				// si le message message apparait ds l'URL
-						if(isset($_GET['message'])) {
-							echo'<div class="alert error">'.htmlspecialchars($_GET['message']).'</div>';
-						}
-			} else if(isset($_GET['success'])){
-					echo'<div class="alert success">'.htmlspecialchars($_GET['message']).'</div>';
-					} 
-					?>
+			<?php if(isset($_SESSION['connect'])) { ?>
+					<!--on va metre en place notre cookies de connection avec la session -->
 		
-
-				<form method="post" action="index.php">
-					<input type="email" name="email" placeholder="Votre adresse email" required />
-					<input type="password" name="password" placeholder="Mot de passe" required />
-					<button type="submit">S'identifier</button>
-					<label id="option"><input type="checkbox" name="auto" checked />Se souvenir de moi</label>
-				</form>
+					<h1>Bonjour !</h1>
+					<p> C'est parti pour un moment de détente avec Netflix</p>
+						
+			<?php } else { ?>
+				
+					<h1>S'identifier</h1>
+				<?php // si le message error apparait ds l'URL
+					if(isset($_GET['error'])) {
+					// si le message message apparait ds l'URL
+							if(isset($_GET['message'])) {
+								echo'<div class="alert error">'.htmlspecialchars($_GET['message']).'</div>';
+							}
+				} else if(isset($_GET['success'])){
+						echo'<div class="alert success">Vous êtes maintenant connecté.</div>';
+						} 
+						?>
 			
 
-				<p class="grey">Première visite sur Netflix ? <a href="inscription.php">Inscrivez-vous</a>.</p>
-		</div>
-	</section>
+					<form method="post" action="index.php">
+						<input type="email" name="email" placeholder="Votre adresse email" required />
+						<input type="password" name="password" placeholder="Mot de passe" required />
+						<button type="submit">S'identifier</button>
+						<label id="option"><input type="checkbox" name="auto" checked />Se souvenir de moi</label>
+					</form>
+				
+
+					<p class="grey">Première visite sur Netflix ? <a href="inscription.php">Inscrivez-vous</a>.</p>
+			<?php } ?>
+			</div>
+		</section>
 
 	<?php include('src/footer.php'); ?>
 </body>
